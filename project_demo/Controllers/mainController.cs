@@ -26,42 +26,45 @@ namespace project_demo.Controllers
         //add a new purchase i.e invoice
         [HttpPost("NewPurchase")]
         //[Authorize(Roles ="USer")]
-        public async Task<IActionResult> newpurchase([FromQuery] int user_id,[FromQuery] int productid, [FromQuery] string Invoiceno, [FromQuery] int Quantity, [FromQuery] string suppliername)
+        public async Task<IActionResult> newpurchase([FromBody] new_purchaseDTO prch) 
+       
         {
-            var res = _mainrepository.Newpurchaseasync(user_id,productid,Invoiceno,Quantity,suppliername);
+            
+            var res = _mainrepository.Newpurchaseasync(prch.user_id,prch.productid,prch.Invoiceno,prch.Quantity,prch.suppliername);
             if(res==null)
             {
                 return BadRequest("product does not exist at first add product");
             }
            
-            return Ok("new invoice added successfully"); 
+            return Ok(new { message = "New invoice added successfully" }); 
         }
 
         //Add a new product
         [HttpPost("Newproduct")]
-        [Authorize(Roles ="User")]
-        public IActionResult newProduct([FromQuery] string ProductName, [FromQuery] string product_detail, [FromQuery] int category_id,[FromQuery] string Category_Name, [FromQuery] int amount)
+        //[Authorize(Roles ="User")]
+        public IActionResult newProduct([FromBody] newproductDTO pd)
         {
-            var res = _mainrepository.NewProduct( ProductName, product_detail,Category_Name, category_id,Category_Name,amount );
-            return Ok("new product added successfully");
+            var res = _mainrepository.NewProduct( pd.ProductName, pd.product_detail,pd.Category_Name, pd.category_id,pd.Category_Name,pd.amount );
+            return Ok( new {message= "new product added successfully" });
         }
 
         //to sell a item
         [HttpPost("NewSale")]
         //[Authorize]
-        public IActionResult newsale([FromQuery] int customer_id,[FromQuery] string customername, [FromQuery] int productid, [FromQuery] int quantity )
+        public IActionResult newsale([FromBody] newsaleDTO saledto )
         {
 
-            var res = _mainrepository.NewSaleAsync(customer_id, customername, productid, quantity);
-            if(res==null)
+            var res = _mainrepository.NewSaleAsync(saledto.customer_id, saledto. customername, saledto.productid, saledto.quantity);
+            if(res== "insufficent quantity")
             {
-                return BadRequest("The mentioned product is not in not in database");
+                return Ok(new {message= "insufficient quantity" });
             }
-            return Ok("sale transicition is  successful");
+            
+            return Ok(new {message= "sale transicition is  successful" });
         }
 
         //to see the inventory size
-        [HttpGet("review inventory")]
+        [HttpGet("review_inventory")]
         //[Authorize]
         public async Task<IActionResult> GetStockdetail()
         {

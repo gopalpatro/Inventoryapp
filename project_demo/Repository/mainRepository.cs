@@ -63,7 +63,7 @@ namespace project_demo.Repository
             return res;
         }
 
-         public async Task<string> NewSaleAsync(int customer_id, string customername, int productid, int quantity)
+         public string NewSaleAsync(int customer_id, string customername, int productid, int quantity)
         {
             var test = _context.products.FirstOrDefault(p => p.ProductId == productid);
             if (test == null)
@@ -75,6 +75,10 @@ namespace project_demo.Repository
             {
                 var res = new Sale { USerId = customer_id, Sale_Date = DateTime.Now, Customer_name = customername, ProductId = productid, Quantity = quantity, amount = (test.price * quantity) };
                 _context.Sales.Add(res);
+            }
+            else if(st1.Quantity < quantity)
+            { 
+                return "insufficent quantity" ;
             }
 
             if (st1 != null)
@@ -143,7 +147,7 @@ namespace project_demo.Repository
                     join q in _context.products on
                     p.ProductId equals q.ProductId where
                     p.Quantity < p.min_Quantity select new
-                    item_quantityDTO { ProductId = q.ProductId, productName = q.ProductName, Quantity = p.Quantity, Last_modified = p.Last_modified }).ToList();
+                    item_quantityDTO { ProductId = q.ProductId, productName = q.ProductName, Quantity = p.Quantity, Last_modified = p.Last_modified,minquantity=p.min_Quantity }).ToList();
             //var res = _context.stocks.Where(r => r.Quantity >= r.min_Quantity).ToList();
 
             

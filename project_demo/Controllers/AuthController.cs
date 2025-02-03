@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using project_demo.Data;
 using project_demo.Model;
+using project_demo.Model.DTO;
 using project_demo.NewFolder2;
 
 
@@ -71,12 +72,16 @@ namespace project_demo.Controllers
         //}
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromQuery] string username, [FromQuery] string password)
+        public async Task<IActionResult> Login([FromBody] loginDTO logi)
+
         {
-            var user = await userManager.FindByEmailAsync(username);
+            //    public string UserName { get; set; }
+            //public string Password { get; set; }
+
+            var user = await userManager.FindByEmailAsync(logi.UserName);
             if (user != null)
             {
-                var res = await userManager.CheckPasswordAsync(user, password);
+                var res = await userManager.CheckPasswordAsync(user,logi. Password);
                 if (res)
                 {
                     //get role of user
@@ -87,7 +92,7 @@ namespace project_demo.Controllers
 
                     var jwtToken = tokenrepository.CreateJwtToken(user, role);
 
-                    return Ok($"Token:{jwtToken}");
+                    return Ok(new {jwtToken });
                 }
             }
             return BadRequest("invalid credentials");
